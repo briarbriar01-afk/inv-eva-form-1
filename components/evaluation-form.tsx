@@ -1,26 +1,19 @@
 'use client';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { EVALUATION_QUESTIONS } from '@/lib/questions';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from '@/components/ui/select';
 import { CheckCircle2, XCircle, MessageSquarePlus, Loader2, CheckCheck } from 'lucide-react';
 
 type Answers = Record<string, boolean | null>;
 type Comments = Record<string, string>;
 
-interface Branch { id: string; name: string; }
-
 interface EvaluationFormProps {
   conductorId: string;
-  branches: Branch[];
-  defaultBranchId?: string;
   existingDraft?: Record<string, unknown>;
 }
 
@@ -40,19 +33,18 @@ function buildInitialComments(draft?: Record<string, unknown>): Comments {
   return c;
 }
 
-export function EvaluationForm({ conductorId, branches, defaultBranchId, existingDraft }: EvaluationFormProps) {
-  const router = useRouter();
+export function EvaluationForm({ conductorId, existingDraft }: EvaluationFormProps) {
   const supabase = createClient();
 
-  const [branchId, setBranchId]     = useState(defaultBranchId ?? existingDraft?.branch_id as string ?? '');
-  const [answers, setAnswers]       = useState<Answers>(buildInitialAnswers(existingDraft));
-  const [comments, setComments]     = useState<Comments>(buildInitialComments(existingDraft));
+  const [organName, setOrganName]     = useState((existingDraft?.organ_name as string) ?? '');
+  const [answers, setAnswers]         = useState<Answers>(buildInitialAnswers(existingDraft));
+  const [comments, setComments]       = useState<Comments>(buildInitialComments(existingDraft));
   const [showComment, setShowComment] = useState<Record<string, boolean>>({});
-  const [loading, setLoading]       = useState(false);
-  const [submitted, setSubmitted]   = useState(false);
-  const [error, setError]           = useState('');
+  const [loading, setLoading]         = useState(false);
+  const [submitted, setSubmitted]     = useState(false);
+  const [error, setError]             = useState('');
 
-  const yesCount = Object.values(answers).filter(Boolean).length;
+  const yesCount     = Object.values(answers).filter(Boolean).length;
   const answeredCount = Object.values(answers).filter((v) => v !== null).length;
 
   function setAnswer(key: string, value: boolean) {
@@ -68,7 +60,7 @@ export function EvaluationForm({ conductorId, branches, defaultBranchId, existin
   }
 
   async function handleSubmit() {
-    if (!branchId) { setError('تکایە لقەکە هەڵبژێرە'); return; }
+    if (!organName.trim()) { setError('تکایە ناوی ئۆرگانەکە بنووسە'); return; }
     if (answeredCount < EVALUATION_QUESTIONS.length) {
       setError('تکایە هەموو پرسیارەکان وەڵامی بدەوە');
       return;
@@ -79,7 +71,8 @@ export function EvaluationForm({ conductorId, branches, defaultBranchId, existin
 
     const payload = {
       conductor_id: conductorId,
-      branch_id: branchId,
+      organ_name: organName.trim(),
+      branch_id: null,
       status: 'submitted',
       submitted_at: new Date().toISOString(),
       ...answers,
@@ -88,7 +81,7 @@ export function EvaluationForm({ conductorId, branches, defaultBranchId, existin
 
     let dbError;
     if (existingDraft?.id) {
-      ({ error: dbError } = await supabase.from('evaluations').update(payload).eq('id', existingDraft.id));
+      ({ error: dbError } = await supabase.from('evaluations').update(payload).eq('id', existingDraft.id as string));
     } else {
       ({ error: dbError } = await supabase.from('evaluations').insert(payload));
     }
@@ -113,21 +106,18 @@ export function EvaluationForm({ conductorId, branches, defaultBranchId, existin
 
   return (
     <div className="space-y-4">
-      {/* Branch selector */}
+      {/* Organ name — free text */}
       <Card>
         <CardContent className="pt-6">
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-semibold rtl-text">ئۆرگان</label>
-            <Select value={branchId} onValueChange={setBranchId}>
-              <SelectTrigger dir="rtl">
-                <SelectValue placeholder="لقێک هەڵبژێرە..." />
-              </SelectTrigger>
-              <SelectContent dir="rtl">
-                {branches.map((b) => (
-                  <SelectItem key={b.id} value={b.id} className="rtl-text">{b.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <label className="text-sm font-semibold rtl-text">ناوی ئۆرگان</label>
+            <Input
+              dir="rtl"
+              placeholder="ناوی ئۆرگانەکە بنووسە..."
+              value={organName}
+              onChange={(e) => setOrganName(e.target.value)}
+              className="rtl-text text-right"
+            />
           </div>
         </CardContent>
       </Card>
@@ -166,7 +156,6 @@ export function EvaluationForm({ conductorId, branches, defaultBranchId, existin
             </CardHeader>
 
             <CardContent className="space-y-3">
-              {/* Yes / No buttons */}
               <div className="flex gap-2 justify-end">
                 <Button
                   type="button"
@@ -190,7 +179,6 @@ export function EvaluationForm({ conductorId, branches, defaultBranchId, existin
                 </Button>
               </div>
 
-              {/* Toggle comment */}
               {!commentVisible && (
                 <button
                   type="button"
@@ -217,25 +205,17 @@ export function EvaluationForm({ conductorId, branches, defaultBranchId, existin
         );
       })}
 
-      {/* Error */}
       {error && (
         <div className="rounded-md bg-red-50 border border-red-200 p-3 text-sm text-red-700 rtl-text">
           {error}
         </div>
       )}
 
-      {/* Submit */}
-      <Button
-        onClick={handleSubmit}
-        disabled={loading}
-        size="lg"
-        className="w-full h-12 text-base"
-      >
-        {loading ? (
-          <><Loader2 className="w-4 h-4 animate-spin" /> چاوەڕێ بکە...</>
-        ) : (
-          <><CheckCheck className="w-5 h-5" /><span className="rtl-text">پێشکەشکردنی جەرد</span></>
-        )}
+      <Button onClick={handleSubmit} disabled={loading} size="lg" className="w-full h-12 text-base">
+        {loading
+          ? <><Loader2 className="w-4 h-4 animate-spin" /> چاوەڕێ بکە...</>
+          : <><CheckCheck className="w-5 h-5" /><span className="rtl-text">پێشکەشکردنی جەرد</span></>
+        }
       </Button>
     </div>
   );

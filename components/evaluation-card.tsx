@@ -17,6 +17,7 @@ interface EvaluationCardProps {
 export function EvaluationCard({ evaluation, conductorName, branchName }: EvaluationCardProps) {
   const [expanded, setExpanded] = useState(false);
 
+  const displayName = (evaluation.organ_name as string) || branchName || '—';
   const yesCount = EVALUATION_QUESTIONS.filter(({ key }) => evaluation[key] === true).length;
   const total = EVALUATION_QUESTIONS.length;
 
@@ -25,10 +26,10 @@ export function EvaluationCard({ evaluation, conductorName, branchName }: Evalua
       <CardHeader className="pb-0 pt-5 px-5">
         {/* Meta row */}
         <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground mb-4">
-          {branchName && (
+          {displayName && (
             <span className="flex items-center gap-1.5 rtl-text">
               <Building2 className="w-3.5 h-3.5" />
-              {branchName}
+              {displayName}
             </span>
           )}
           {conductorName && (

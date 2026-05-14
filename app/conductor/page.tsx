@@ -13,18 +13,12 @@ export default async function ConductorPage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('*, branches(name)')
+    .select('full_name, email')
     .eq('id', user.id)
     .single();
 
-  const { data: branches } = await supabase
-    .from('branches')
-    .select('id, name')
-    .order('name');
-
   const today = new Date().toISOString().split('T')[0];
 
-  // Check for an existing draft today
   const { data: existingDraft } = await supabase
     .from('evaluations')
     .select('*')
@@ -32,11 +26,10 @@ export default async function ConductorPage() {
     .eq('status', 'draft')
     .gte('created_at', `${today}T00:00:00`)
     .lte('created_at', `${today}T23:59:59`)
-    .single();
+    .maybeSingle();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-slate-100">
-      {/* Header */}
       <header className="bg-white border-b shadow-sm sticky top-0 z-10">
         <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -44,23 +37,17 @@ export default async function ConductorPage() {
               <ClipboardList className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-base font-bold rtl-text">جەردی کەل و پەل</h1>
-              <p className="text-xs text-muted-foreground rtl-text">
-                {profile?.full_name ?? user.email}
-                {profile?.branches && ` — ${(profile.branches as any).name}`}
-              </p>
+              <h1 className="text-base font-bold rtl-text">هەڵسەنگاندنی پرۆسەی جەرد</h1>
+              <p className="text-xs text-muted-foreground rtl-text">{profile?.full_name ?? user.email}</p>
             </div>
           </div>
           <LogoutButton />
         </div>
       </header>
 
-      {/* Main */}
       <main className="max-w-3xl mx-auto px-4 py-6">
         <EvaluationForm
           conductorId={user.id}
-          branches={branches ?? []}
-          defaultBranchId={profile?.branch_id ?? undefined}
           existingDraft={existingDraft ?? undefined}
         />
       </main>
