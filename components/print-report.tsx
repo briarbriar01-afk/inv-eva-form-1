@@ -117,7 +117,7 @@ export function PrintReport({ evaluation, branchName, conductorName, submittedAt
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
               <InfoCell label="ناوی ئۆرگان"  value={organName} />
               <InfoCell label="ناوی ژمێریار" value={displayConductor} />
-              <InfoCell label="بەروارەکە"    value={date} />
+              <InfoCell label="ڕێکەوت"       value={date} />
             </div>
           </div>
 

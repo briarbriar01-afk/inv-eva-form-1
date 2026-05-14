@@ -66,7 +66,7 @@ export function EvaluationForm({ conductorId, existingDraft }: EvaluationFormPro
   async function handleSubmit() {
     if (!organName.trim())     { setError('تکایە ناوی ئۆرگانەکە بنووسە');     return; }
     if (!conductorName.trim()) { setError('تکایە ناوی ژمێریارەکە بنووسە');    return; }
-    if (!evalDate)             { setError('تکایە بەروارەکە دیاری بکە');        return; }
+    if (!evalDate)             { setError('تکایە ڕێکەوت دیاری بکە');        return; }
     if (answeredCount < EVALUATION_QUESTIONS.length) {
       setError('تکایە هەموو پرسیارەکان وەڵامی بدەوە');
       return;
@@ -98,8 +98,7 @@ export function EvaluationForm({ conductorId, existingDraft }: EvaluationFormPro
 
     setLoading(false);
     if (dbError) {
-      setError('هەڵەیەک ڕوویدا، دووبارە هەوڵ بدەوە');
-      console.error(dbError);
+      setError(`هەڵەیەک ڕوویدا: ${dbError.message}`);
       return;
     }
     setSubmitted(true);
@@ -150,7 +149,7 @@ export function EvaluationForm({ conductorId, existingDraft }: EvaluationFormPro
 
           {/* Date */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-semibold rtl-text">بەروارەکە <span className="text-red-500">*</span></label>
+            <label className="text-sm font-semibold rtl-text">ڕێکەوت <span className="text-red-500">*</span></label>
             <Input
               type="date"
               value={evalDate}
