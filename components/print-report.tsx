@@ -41,8 +41,10 @@ function ArcGauge({ pct }: { pct: number }) {
 
 /* ── Main ────────────────────────────────────── */
 export function PrintReport({ evaluation, branchName, conductorName, submittedAt }: PrintReportProps) {
-  const organName = (evaluation.organ_name as string) || branchName || '—';
-  const date = new Date(submittedAt).toLocaleDateString('ar-IQ', {
+  const organName    = (evaluation.organ_name     as string) || branchName    || '—';
+  const displayConductor = (evaluation.conductor_name as string) || conductorName || '—';
+  const rawDate      = (evaluation.evaluation_date as string) || submittedAt;
+  const date = new Date(rawDate).toLocaleDateString('ar-IQ', {
     year: 'numeric', month: 'long', day: 'numeric',
   });
 
@@ -114,7 +116,7 @@ export function PrintReport({ evaluation, branchName, conductorName, submittedAt
           <div style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0', padding: '14px 32px' }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
               <InfoCell label="ناوی ئۆرگان"  value={organName} />
-              <InfoCell label="ناوی ژمێریار" value={conductorName} />
+              <InfoCell label="ناوی ژمێریار" value={displayConductor} />
               <InfoCell label="بەروارەکە"    value={date} />
             </div>
           </div>

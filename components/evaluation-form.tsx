@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle2, XCircle, MessageSquarePlus, Loader2, CheckCheck } from 'lucide-react';
 
-type Answers = Record<string, boolean | null>;
+type Answers  = Record<string, boolean | null>;
 type Comments = Record<string, string>;
 
 interface EvaluationFormProps {
@@ -33,34 +33,40 @@ function buildInitialComments(draft?: Record<string, unknown>): Comments {
   return c;
 }
 
+function todayISO() {
+  return new Date().toISOString().split('T')[0];
+}
+
 export function EvaluationForm({ conductorId, existingDraft }: EvaluationFormProps) {
   const supabase = createClient();
 
-  const [organName, setOrganName]     = useState((existingDraft?.organ_name as string) ?? '');
-  const [answers, setAnswers]         = useState<Answers>(buildInitialAnswers(existingDraft));
-  const [comments, setComments]       = useState<Comments>(buildInitialComments(existingDraft));
-  const [showComment, setShowComment] = useState<Record<string, boolean>>({});
-  const [loading, setLoading]         = useState(false);
-  const [submitted, setSubmitted]     = useState(false);
-  const [error, setError]             = useState('');
+  const [organName,      setOrganName]      = useState((existingDraft?.organ_name      as string) ?? '');
+  const [conductorName,  setConductorName]  = useState((existingDraft?.conductor_name  as string) ?? '');
+  const [evalDate,       setEvalDate]       = useState((existingDraft?.evaluation_date as string) ?? todayISO());
+  const [answers,        setAnswers]        = useState<Answers>(buildInitialAnswers(existingDraft));
+  const [comments,       setComments]       = useState<Comments>(buildInitialComments(existingDraft));
+  const [showComment,    setShowComment]    = useState<Record<string, boolean>>({});
+  const [loading,        setLoading]        = useState(false);
+  const [submitted,      setSubmitted]      = useState(false);
+  const [error,          setError]          = useState('');
 
-  const yesCount     = Object.values(answers).filter(Boolean).length;
+  const yesCount      = Object.values(answers).filter(Boolean).length;
   const answeredCount = Object.values(answers).filter((v) => v !== null).length;
 
   function setAnswer(key: string, value: boolean) {
     setAnswers((prev) => ({ ...prev, [key]: value }));
   }
-
   function setComment(key: string, value: string) {
     setComments((prev) => ({ ...prev, [key]: value }));
   }
-
   function toggleComment(key: string) {
     setShowComment((prev) => ({ ...prev, [key]: !prev[key] }));
   }
 
   async function handleSubmit() {
-    if (!organName.trim()) { setError('تکایە ناوی ئۆرگانەکە بنووسە'); return; }
+    if (!organName.trim())     { setError('تکایە ناوی ئۆرگانەکە بنووسە');     return; }
+    if (!conductorName.trim()) { setError('تکایە ناوی ژمێریارەکە بنووسە');    return; }
+    if (!evalDate)             { setError('تکایە بەروارەکە دیاری بکە');        return; }
     if (answeredCount < EVALUATION_QUESTIONS.length) {
       setError('تکایە هەموو پرسیارەکان وەڵامی بدەوە');
       return;
@@ -70,24 +76,32 @@ export function EvaluationForm({ conductorId, existingDraft }: EvaluationFormPro
     setError('');
 
     const payload = {
-      conductor_id: conductorId,
-      organ_name: organName.trim(),
-      branch_id: null,
-      status: 'submitted',
-      submitted_at: new Date().toISOString(),
+      conductor_id:    conductorId,
+      organ_name:      organName.trim(),
+      conductor_name:  conductorName.trim(),
+      evaluation_date: evalDate,
+      status:          'submitted',
+      submitted_at:    new Date().toISOString(),
       ...answers,
       ...comments,
     };
 
     let dbError;
     if (existingDraft?.id) {
-      ({ error: dbError } = await supabase.from('evaluations').update(payload).eq('id', existingDraft.id as string));
+      ({ error: dbError } = await supabase
+        .from('evaluations')
+        .update(payload)
+        .eq('id', existingDraft.id as string));
     } else {
       ({ error: dbError } = await supabase.from('evaluations').insert(payload));
     }
 
     setLoading(false);
-    if (dbError) { setError('هەڵەیەک ڕوویدا، دووبارە هەوڵ بدەوە'); return; }
+    if (dbError) {
+      setError('هەڵەیەک ڕوویدا، دووبارە هەوڵ بدەوە');
+      console.error(dbError);
+      return;
+    }
     setSubmitted(true);
   }
 
@@ -106,17 +120,43 @@ export function EvaluationForm({ conductorId, existingDraft }: EvaluationFormPro
 
   return (
     <div className="space-y-4">
-      {/* Organ name — free text */}
+
+      {/* Info card: organ + conductor + date */}
       <Card>
-        <CardContent className="pt-6">
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-semibold rtl-text">ناوی ئۆرگان</label>
+        <CardContent className="pt-5 pb-5 space-y-4">
+          {/* Organ name */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-semibold rtl-text">ناوی ئۆرگان <span className="text-red-500">*</span></label>
             <Input
               dir="rtl"
               placeholder="ناوی ئۆرگانەکە بنووسە..."
               value={organName}
               onChange={(e) => setOrganName(e.target.value)}
               className="rtl-text text-right"
+            />
+          </div>
+
+          {/* Conductor name */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-semibold rtl-text">ناوی ژمێریار <span className="text-red-500">*</span></label>
+            <Input
+              dir="rtl"
+              placeholder="ناوی خۆت بنووسە..."
+              value={conductorName}
+              onChange={(e) => setConductorName(e.target.value)}
+              className="rtl-text text-right"
+            />
+          </div>
+
+          {/* Date */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-semibold rtl-text">بەروارەکە <span className="text-red-500">*</span></label>
+            <Input
+              type="date"
+              value={evalDate}
+              onChange={(e) => setEvalDate(e.target.value)}
+              dir="ltr"
+              className="text-left"
             />
           </div>
         </CardContent>
@@ -132,7 +172,7 @@ export function EvaluationForm({ conductorId, existingDraft }: EvaluationFormPro
 
       {/* Question cards */}
       {EVALUATION_QUESTIONS.map((q, index) => {
-        const answer = answers[q.key];
+        const answer        = answers[q.key];
         const commentVisible = showComment[q.commentKey] || !!comments[q.commentKey];
 
         return (
