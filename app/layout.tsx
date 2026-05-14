@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import './globals.css';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'سیستەمی جەردی کەل و پەل',
   description: 'Inventory Evaluation System',
