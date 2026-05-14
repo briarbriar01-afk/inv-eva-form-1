@@ -2,68 +2,50 @@ import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
 export async function middleware(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({ request });
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() { return request.cookies.getAll(); },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
-          supabaseResponse = NextResponse.next({ request });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          );
-        },
-      },
-    }
-  );
-
-  const { data: { user } } = await supabase.auth.getUser();
   const { pathname } = request.nextUrl;
 
-  // Public routes
-  if (pathname === '/login' || pathname.startsWith('/api/auth')) {
-    if (user) {
-      // Redirect logged-in users away from login
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .single();
-
-      const destination = profile?.role === 'supervisor' ? '/supervisor' : '/conductor';
-      return NextResponse.redirect(new URL(destination, request.url));
-    }
-    return supabaseResponse;
+  // Skip static assets and auth callback
+  if (
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/api/auth') ||
+    pathname === '/favicon.ico'
+  ) {
+    return NextResponse.next();
   }
 
-  // Protected routes — require auth
-  if (!user) {
+  // If env vars not set, allow through (prevents crash during misconfiguration)
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!supabaseUrl || !supabaseKey) return NextResponse.next();
+
+  let response = NextResponse.next({ request });
+
+  const supabase = createServerClient(supabaseUrl, supabaseKey, {
+    cookies: {
+      getAll() { return request.cookies.getAll(); },
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+        response = NextResponse.next({ request });
+        cookiesToSet.forEach(({ name, value, options }) =>
+          response.cookies.set(name, value, options)
+        );
+      },
+    },
+  });
+
+  const { data: { user } } = await supabase.auth.getUser();
+
+  // Logged-in user hitting /login → send to home
+  if (pathname === '/login' && user) {
+    return NextResponse.redirect(new URL('/', request.url));
+  }
+
+  // Protected routes — must be logged in
+  if (pathname !== '/login' && !user) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  // Role-based routing
-  if (pathname.startsWith('/supervisor') || pathname.startsWith('/conductor')) {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single();
-
-    const role = profile?.role;
-
-    if (pathname.startsWith('/supervisor') && role !== 'supervisor') {
-      return NextResponse.redirect(new URL('/conductor', request.url));
-    }
-    if (pathname.startsWith('/conductor') && role !== 'conductor') {
-      return NextResponse.redirect(new URL('/supervisor', request.url));
-    }
-  }
-
-  return supabaseResponse;
+  return response;
 }
 
 export const config = {
