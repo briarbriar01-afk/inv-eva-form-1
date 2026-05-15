@@ -84,9 +84,12 @@ export function EvaluationForm({ conductorId, existingDraft }: EvaluationFormPro
     setError('');
 
     const basePayload = {
-      conductor_id: conductorId,
-      status:       'submitted',
-      submitted_at: new Date().toISOString(),
+      conductor_id:   conductorId,
+      organ_name:     organName.trim(),
+      conductor_name: conductorName.trim(),
+      evaluation_date: evalDate,
+      status:          'submitted',
+      submitted_at:    new Date().toISOString(),
       ...answers,
       ...comments,
     };
