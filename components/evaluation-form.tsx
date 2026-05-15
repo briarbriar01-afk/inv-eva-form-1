@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { EVALUATION_QUESTIONS } from '@/lib/questions';
 import { Button } from '@/components/ui/button';
@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, XCircle, MessageSquarePlus, Loader2, CheckCheck } from 'lucide-react';
+import { CheckCircle2, XCircle, MessageSquarePlus, Loader2, CheckCheck, Printer } from 'lucide-react';
 
 type Answers  = Record<string, boolean | null>;
 type Comments = Record<string, string>;
@@ -40,15 +40,23 @@ function todayISO() {
 export function EvaluationForm({ conductorId, existingDraft }: EvaluationFormProps) {
   const supabase = createClient();
 
-  const [organName,      setOrganName]      = useState((existingDraft?.organ_name      as string) ?? '');
-  const [conductorName,  setConductorName]  = useState((existingDraft?.conductor_name  as string) ?? '');
-  const [evalDate,       setEvalDate]       = useState((existingDraft?.evaluation_date as string) ?? todayISO());
-  const [answers,        setAnswers]        = useState<Answers>(buildInitialAnswers(existingDraft));
-  const [comments,       setComments]       = useState<Comments>(buildInitialComments(existingDraft));
-  const [showComment,    setShowComment]    = useState<Record<string, boolean>>({});
-  const [loading,        setLoading]        = useState(false);
-  const [submitted,      setSubmitted]      = useState(false);
-  const [error,          setError]          = useState('');
+  const [branchId,      setBranchId]      = useState<string | null>(null);
+  const [organName,     setOrganName]     = useState('');
+  const [conductorName, setConductorName] = useState('');
+  const [evalDate,      setEvalDate]      = useState(todayISO());
+  const [answers,       setAnswers]       = useState<Answers>(buildInitialAnswers(existingDraft));
+  const [comments,      setComments]      = useState<Comments>(buildInitialComments(existingDraft));
+  const [showComment,   setShowComment]   = useState<Record<string, boolean>>({});
+  const [loading,       setLoading]       = useState(false);
+  const [submittedId,   setSubmittedId]   = useState<string | null>(null);
+  const [error,         setError]         = useState('');
+
+  // Fetch any branch_id to satisfy the NOT NULL DB constraint
+  useEffect(() => {
+    supabase.from('branches').select('id').limit(1).single().then(({ data }) => {
+      if (data?.id) setBranchId(data.id);
+    });
+  }, []);
 
   const yesCount      = Object.values(answers).filter(Boolean).length;
   const answeredCount = Object.values(answers).filter((v) => v !== null).length;
@@ -64,8 +72,8 @@ export function EvaluationForm({ conductorId, existingDraft }: EvaluationFormPro
   }
 
   async function handleSubmit() {
-    if (!organName.trim())     { setError('تکایە ناوی ئۆرگانەکە بنووسە');     return; }
-    if (!conductorName.trim()) { setError('تکایە ناوی ژمێریارەکە بنووسە');    return; }
+    if (!organName.trim())     { setError('تکایە ناوی ئۆرگانەکە بنووسە');   return; }
+    if (!conductorName.trim()) { setError('تکایە ناوی ژمێریارەکە بنووسە');  return; }
     if (!evalDate)             { setError('تکایە ڕێکەوت دیاری بکە');        return; }
     if (answeredCount < EVALUATION_QUESTIONS.length) {
       setError('تکایە هەموو پرسیارەکان وەڵامی بدەوە');
@@ -75,25 +83,31 @@ export function EvaluationForm({ conductorId, existingDraft }: EvaluationFormPro
     setLoading(true);
     setError('');
 
-    const payload = {
-      conductor_id:    conductorId,
-      organ_name:      organName.trim(),
-      conductor_name:  conductorName.trim(),
-      evaluation_date: evalDate,
-      status:          'submitted',
-      submitted_at:    new Date().toISOString(),
+    const basePayload = {
+      conductor_id: conductorId,
+      status:       'submitted',
+      submitted_at: new Date().toISOString(),
       ...answers,
       ...comments,
     };
 
-    let dbError;
+    let dbError: { message: string } | null = null;
+    let resultId: string | null = (existingDraft?.id as string) ?? null;
+
     if (existingDraft?.id) {
-      ({ error: dbError } = await supabase
+      const { error: err } = await supabase
         .from('evaluations')
-        .update(payload)
-        .eq('id', existingDraft.id as string));
+        .update(basePayload)
+        .eq('id', existingDraft.id as string);
+      dbError = err;
     } else {
-      ({ error: dbError } = await supabase.from('evaluations').insert(payload));
+      const { data, error: err } = await supabase
+        .from('evaluations')
+        .insert({ ...basePayload, branch_id: branchId })
+        .select('id')
+        .single();
+      dbError = err;
+      resultId = data?.id ?? null;
     }
 
     setLoading(false);
@@ -101,10 +115,11 @@ export function EvaluationForm({ conductorId, existingDraft }: EvaluationFormPro
       setError(`هەڵەیەک ڕوویدا: ${dbError.message}`);
       return;
     }
-    setSubmitted(true);
+    setSubmittedId(resultId);
   }
 
-  if (submitted) {
+  if (submittedId !== null) {
+    const printUrl = `/print/${submittedId}?organ=${encodeURIComponent(organName)}&conductor=${encodeURIComponent(conductorName)}&date=${encodeURIComponent(evalDate)}`;
     return (
       <div className="flex flex-col items-center justify-center gap-4 py-24 text-center">
         <CheckCheck className="w-16 h-16 text-green-600" />
@@ -113,6 +128,14 @@ export function EvaluationForm({ conductorId, existingDraft }: EvaluationFormPro
         <Badge variant="success" className="text-base px-4 py-1">
           {yesCount}/{EVALUATION_QUESTIONS.length} بەڵێ
         </Badge>
+        <Button
+          variant="outline"
+          className="gap-2 mt-2"
+          onClick={() => window.open(printUrl, '_blank')}
+        >
+          <Printer className="w-4 h-4" />
+          <span className="rtl-text">چاپکردنی ڕاپۆرت</span>
+        </Button>
       </div>
     );
   }
@@ -120,10 +143,9 @@ export function EvaluationForm({ conductorId, existingDraft }: EvaluationFormPro
   return (
     <div className="space-y-4">
 
-      {/* Info card: organ + conductor + date */}
+      {/* Info card */}
       <Card>
         <CardContent className="pt-5 pb-5 space-y-4">
-          {/* Organ name */}
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-semibold rtl-text">ناوی ئۆرگان <span className="text-red-500">*</span></label>
             <Input
@@ -135,7 +157,6 @@ export function EvaluationForm({ conductorId, existingDraft }: EvaluationFormPro
             />
           </div>
 
-          {/* Conductor name */}
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-semibold rtl-text">ناوی ژمێریار <span className="text-red-500">*</span></label>
             <Input
@@ -147,7 +168,6 @@ export function EvaluationForm({ conductorId, existingDraft }: EvaluationFormPro
             />
           </div>
 
-          {/* Date */}
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-semibold rtl-text">ڕێکەوت <span className="text-red-500">*</span></label>
             <Input
@@ -171,7 +191,7 @@ export function EvaluationForm({ conductorId, existingDraft }: EvaluationFormPro
 
       {/* Question cards */}
       {EVALUATION_QUESTIONS.map((q, index) => {
-        const answer        = answers[q.key];
+        const answer         = answers[q.key];
         const commentVisible = showComment[q.commentKey] || !!comments[q.commentKey];
 
         return (
