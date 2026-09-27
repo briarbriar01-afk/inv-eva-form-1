@@ -1,13 +1,30 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-labelledby="title desc">
-  <title id="title">PDK logo</title>
-  <desc id="desc">Circular PDK emblem in navy, red, yellow and white</desc>
-  <circle cx="100" cy="100" r="96" fill="#fff" stroke="#e52b1a" stroke-width="8"/>
-  <circle cx="100" cy="100" r="84" fill="#173e88"/>
-  <g fill="#f4c400" transform="translate(100 100)">
-    <path d="M-5-78h10l-2 52H-3z"/><path d="M-5-78h10l-2 52H-3z" transform="rotate(30)"/><path d="M-5-78h10l-2 52H-3z" transform="rotate(60)"/><path d="M-5-78h10l-2 52H-3z" transform="rotate(90)"/><path d="M-5-78h10l-2 52H-3z" transform="rotate(120)"/><path d="M-5-78h10l-2 52H-3z" transform="rotate(150)"/><path d="M-5-78h10l-2 52H-3z" transform="rotate(180)"/><path d="M-5-78h10l-2 52H-3z" transform="rotate(210)"/><path d="M-5-78h10l-2 52H-3z" transform="rotate(240)"/><path d="M-5-78h10l-2 52H-3z" transform="rotate(270)"/><path d="M-5-78h10l-2 52H-3z" transform="rotate(300)"/><path d="M-5-78h10l-2 52H-3z" transform="rotate(330)"/>
+  <title id="title">PDK emblem</title>
+  <desc id="desc">Partiya Demokrat a Kurdistan circular emblem with an eagle and sun rays</desc>
+  <defs>
+    <path id="top-arc" d="M 28,96 A 72,72 0 0 1 172,96"/>
+    <path id="bottom-arc" d="M 25,111 A 77,77 0 0 0 175,111"/>
+  </defs>
+
+  <circle cx="100" cy="100" r="98" fill="#fff" stroke="#ed291b" stroke-width="6"/>
+  <circle cx="100" cy="100" r="91" fill="#fff" stroke="#1d1d1d" stroke-width="1.5"/>
+
+  <text fill="#171717" font-family="Arial, sans-serif" font-size="8.5" font-weight="700" text-anchor="middle">
+    <textPath href="#top-arc" startOffset="50%">پارتى دێموكراتى كوردستان</textPath>
+  </text>
+  <text fill="#171717" font-family="Arial, sans-serif" font-size="7" font-weight="700" text-anchor="middle">
+    <textPath href="#bottom-arc" startOffset="50%">PARTIYA DEMOKRATA KURDISTANÊ</textPath>
+  </text>
+
+  <circle cx="100" cy="100" r="59" fill="#f7c900"/>
+  <g fill="#ffd928" transform="translate(100 100)">
+    <path d="M-3-58h6l-1 38h-4z"/><path d="M-3-58h6l-1 38h-4z" transform="rotate(15)"/><path d="M-3-58h6l-1 38h-4z" transform="rotate(30)"/><path d="M-3-58h6l-1 38h-4z" transform="rotate(45)"/><path d="M-3-58h6l-1 38h-4z" transform="rotate(60)"/><path d="M-3-58h6l-1 38h-4z" transform="rotate(75)"/><path d="M-3-58h6l-1 38h-4z" transform="rotate(90)"/><path d="M-3-58h6l-1 38h-4z" transform="rotate(105)"/><path d="M-3-58h6l-1 38h-4z" transform="rotate(120)"/><path d="M-3-58h6l-1 38h-4z" transform="rotate(135)"/><path d="M-3-58h6l-1 38h-4z" transform="rotate(150)"/><path d="M-3-58h6l-1 38h-4z" transform="rotate(165)"/><path d="M-3-58h6l-1 38h-4z" transform="rotate(180)"/><path d="M-3-58h6l-1 38h-4z" transform="rotate(195)"/><path d="M-3-58h6l-1 38h-4z" transform="rotate(210)"/><path d="M-3-58h6l-1 38h-4z" transform="rotate(225)"/><path d="M-3-58h6l-1 38h-4z" transform="rotate(240)"/><path d="M-3-58h6l-1 38h-4z" transform="rotate(255)"/><path d="M-3-58h6l-1 38h-4z" transform="rotate(270)"/><path d="M-3-58h6l-1 38h-4z" transform="rotate(285)"/><path d="M-3-58h6l-1 38h-4z" transform="rotate(300)"/><path d="M-3-58h6l-1 38h-4z" transform="rotate(315)"/><path d="M-3-58h6l-1 38h-4z" transform="rotate(330)"/><path d="M-3-58h6l-1 38h-4z" transform="rotate(345)"/>
   </g>
-  <circle cx="100" cy="100" r="48" fill="#fff" stroke="#f4c400" stroke-width="5"/>
-  <path d="M67 117c10-20 15-41 35-47 14 4 22 19 31 33l-12-5 7 17-24-8-17 12-13-2z" fill="#1b1b1b"/>
-  <path d="M80 77c7-10 17-13 25-9-8 6-12 12-14 22z" fill="#3b3b3b"/>
-  <text x="100" y="158" text-anchor="middle" font-family="Arial,sans-serif" font-size="14" font-weight="700" fill="#fff">KDP 1946</text>
+
+  <circle cx="100" cy="100" r="38" fill="#f8f8f5" stroke="#f7c900" stroke-width="3"/>
+  <path d="M72 119c5-13 10-21 16-28-2-9 2-18 11-23 3 4 4 8 3 12 7 0 14 6 18 14l10 16-16-5 7 12-22-8-12 11z" fill="#292929"/>
+  <path d="M91 71c5-8 12-11 18-8-5 5-8 11-9 18z" fill="#111"/>
+  <path d="M72 119l-9 8 19-2 10-6M128 119l10 8-20-2-9-6" fill="#3a3a3a"/>
+  <text x="100" y="151" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="700" fill="#171717">KDP</text>
+  <text x="100" y="162" text-anchor="middle" font-family="Arial, sans-serif" font-size="7" font-weight="700" fill="#171717">1946</text>
 </svg>
