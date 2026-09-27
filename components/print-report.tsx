@@ -1,6 +1,7 @@
 'use client';
 import { EVALUATION_QUESTIONS } from '@/lib/questions';
 import { Printer, Download } from 'lucide-react';
+import { PdkLogo } from '@/components/pdk-logo';
 
 interface PrintReportProps {
   evaluation: Record<string, unknown>;
@@ -25,7 +26,7 @@ function ArcGauge({ pct }: { pct: number }) {
   const fgE = pt(startDeg + (pct / 100) * span);
   const fgLarge = (pct / 100) * span > 180 ? 1 : 0;
 
-  const color  = pct >= 85 ? '#16a34a' : pct >= 60 ? '#d97706' : '#dc2626';
+  const color  = pct >= 85 ? '#173e88' : pct >= 60 ? '#b58b00' : '#dc2626';
   const bgPath = `M${s.x},${s.y} A${r},${r} 0 1,1 ${bgE.x},${bgE.y}`;
   const fgPath = `M${s.x},${s.y} A${r},${r} 0 ${fgLarge},1 ${fgE.x},${fgE.y}`;
 
@@ -51,7 +52,7 @@ export function PrintReport({ evaluation, branchName, conductorName, submittedAt
   const yesCount = EVALUATION_QUESTIONS.filter(({ key }) => evaluation[key] === true).length;
   const noCount  = EVALUATION_QUESTIONS.length - yesCount;
   const pct      = Math.round((yesCount / EVALUATION_QUESTIONS.length) * 100);
-  const color    = pct >= 85 ? '#16a34a' : pct >= 60 ? '#d97706' : '#dc2626';
+  const color    = pct >= 85 ? '#173e88' : pct >= 60 ? '#b58b00' : '#dc2626';
   const label    = pct >= 85 ? 'زۆر باش' : pct >= 60 ? 'باش' : 'پێویستی بە باشترکردن هەیە';
 
   return (
@@ -90,7 +91,7 @@ export function PrintReport({ evaluation, branchName, conductorName, submittedAt
               window.print();
               document.title = orig;
             }}
-            style={{ padding: '7px 18px', background: '#16a34a', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontSize: 13, display: 'flex', alignItems: 'center', gap: 6 }}
+            style={{ padding: '7px 18px', background: '#173e88', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontSize: 13, display: 'flex', alignItems: 'center', gap: 6 }}
           >
             <Download size={14} /> پاشەکەوتکردن PDF
           </button>
@@ -104,12 +105,12 @@ export function PrintReport({ evaluation, branchName, conductorName, submittedAt
         }}>
 
           {/* Header */}
-          <div style={{ background: 'linear-gradient(135deg,#1e3a8a 0%,#2563eb 100%)', padding: '22px 32px', color: '#fff', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ background: 'linear-gradient(135deg,#173e88 0%,#285bc2 100%)', padding: '22px 32px', color: '#fff', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
               <div style={{ fontSize: 20, fontWeight: 800 }}>هەڵسەنگاندنی پرۆسەی جەرد</div>
               <div style={{ fontSize: 11, marginTop: 5, opacity: 0.75, letterSpacing: 0.3 }}>سیستەمی جەردی کەل و پەل</div>
             </div>
-            <div style={{ width: 46, height: 46, borderRadius: 12, background: 'rgba(255,255,255,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>📋</div>
+            <PdkLogo className="h-12 w-12" />
           </div>
 
           {/* Info strip */}
@@ -135,7 +136,7 @@ export function PrintReport({ evaluation, branchName, conductorName, submittedAt
                 ئەنجامی هەڵسەنگاندن
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 14 }}>
-                <StatBox value={yesCount} label="وەڵامی بەڵێ"   color="#16a34a" bg="#f0fdf4" />
+                <StatBox value={yesCount} label="وەڵامی بەڵێ"   color="#173e88" bg="#eef3ff" />
                 <StatBox value={noCount}  label="وەڵامی نەخێر" color="#dc2626" bg="#fef2f2" />
               </div>
               {/* Progress bar */}
@@ -163,9 +164,9 @@ export function PrintReport({ evaluation, branchName, conductorName, submittedAt
 
                 return (
                   <div key={key} style={{
-                    border: `1px solid ${isYes ? '#bbf7d0' : isNo ? '#fecaca' : '#e2e8f0'}`,
+                    border: `1px solid ${isYes ? '#f4c400' : isNo ? '#fecaca' : '#e2e8f0'}`,
                     borderRadius: 8,
-                    background: isYes ? '#f0fdf4' : isNo ? '#fef2f2' : '#f8fafc',
+                    background: isYes ? '#fffbea' : isNo ? '#fef2f2' : '#f8fafc',
                     padding: '8px 12px',
                   }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10 }}>
@@ -179,7 +180,7 @@ export function PrintReport({ evaluation, branchName, conductorName, submittedAt
                       </div>
                       <div style={{
                         flexShrink: 0, padding: '2px 12px', borderRadius: 16, fontSize: 11, fontWeight: 700,
-                        background: isYes ? '#16a34a' : isNo ? '#dc2626' : '#94a3b8',
+                        background: isYes ? '#173e88' : isNo ? '#dc2626' : '#94a3b8',
                         color: '#fff', minWidth: 54, textAlign: 'center',
                       }}>
                         {isYes ? '✓ بەڵێ' : isNo ? '✗ نەخێر' : '—'}

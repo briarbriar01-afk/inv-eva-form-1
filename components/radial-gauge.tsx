@@ -10,7 +10,7 @@ export function RadialGauge({ yesCount, total }: RadialGaugeProps) {
   const percentage = total > 0 ? Math.round((yesCount / total) * 100) : 0;
 
   const color =
-    percentage >= 85 ? '#16a34a' :
+    percentage >= 85 ? '#173e88' :
     percentage >= 60 ? '#ca8a04' :
     '#dc2626';
 

@@ -55,7 +55,7 @@ export function EvaluationCard({ evaluation, conductorName, branchName }: Evalua
                 <div
                   key={key}
                   className={`flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-medium rtl-text ${
-                    val === true  ? 'bg-green-50 text-green-700' :
+                    val === true  ? 'bg-[#fffbea] text-[#173e88]' :
                     val === false ? 'bg-red-50 text-red-700' :
                     'bg-muted text-muted-foreground'
                   }`}
@@ -109,7 +109,7 @@ export function EvaluationCard({ evaluation, conductorName, branchName }: Evalua
             return (
               <div key={key} className="space-y-1">
                 <div className="flex items-start gap-2">
-                  <span className={`flex-shrink-0 mt-0.5 ${val === true ? 'text-green-600' : val === false ? 'text-red-600' : 'text-muted-foreground'}`}>
+                  <span className={`flex-shrink-0 mt-0.5 ${val === true ? 'text-[#173e88]' : val === false ? 'text-red-600' : 'text-muted-foreground'}`}>
                     {val === true  ? <CheckCircle2 className="w-4 h-4" /> :
                      val === false ? <XCircle className="w-4 h-4" /> :
                      <span className="w-4 h-4 block rounded-full border-2 border-muted-foreground/40" />}

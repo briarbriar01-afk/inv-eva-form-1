@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { KanbanCard } from '@/components/kanban-card';
 import { ClipboardList, Users, TrendingUp, CheckCheck } from 'lucide-react';
+import { PdkLogo } from '@/components/pdk-logo';
 import { EVALUATION_QUESTIONS } from '@/lib/questions';
 import { LogoutButton } from '@/components/logout-button';
 import { RefreshButton } from '@/components/refresh-button';
@@ -75,7 +76,7 @@ export default async function SupervisorPage() {
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center">
-              <ClipboardList className="w-5 h-5 text-white" />
+              <PdkLogo className="w-7 h-7" />
             </div>
             <div>
               <h1 className="text-base font-bold rtl-text">داشبۆردی سەرپەرشتیار</h1>
@@ -106,8 +107,8 @@ export default async function SupervisorPage() {
             label="ژمێریار"
           />
           <StatCard
-            icon={<TrendingUp className="w-5 h-5 text-green-600" />}
-            bg="bg-green-50"
+            icon={<TrendingUp className="w-5 h-5 text-[#173e88]" />}
+            bg="bg-[#eef3ff]"
             value={`${overallPct}%`}
             label="ئەنجامی گشتی"
           />
@@ -122,7 +123,7 @@ export default async function SupervisorPage() {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
 
-            <KanbanColumn title="زۆر باش" count={excellent.length} headerBg="#16a34a" countBg="#dcfce7" countColor="#15803d">
+            <KanbanColumn title="زۆر باش" count={excellent.length} headerBg="#173e88" countBg="#fff4bf" countColor="#173e88">
               {excellent.map((ev) => (
                 <KanbanCard
                   key={ev.id as string}

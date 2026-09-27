@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ClipboardList, Loader2 } from 'lucide-react';
+import { PdkLogo } from '@/components/pdk-logo';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -40,7 +41,7 @@ export default function LoginPage() {
         {/* Logo / Title */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary shadow-lg mb-4">
-            <ClipboardList className="w-8 h-8 text-white" />
+            <PdkLogo className="w-12 h-12" />
           </div>
           <h1 className="text-2xl font-bold text-foreground rtl-text">سیستەمی جەردی کەل و پەل</h1>
           <p className="text-muted-foreground mt-1 rtl-text text-sm">تکایە چوونە ژوورەوەی هەژمارەکەت بکە</p>

@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle2, XCircle, MessageSquarePlus, Loader2, CheckCheck, Printer } from 'lucide-react';
+import { PdkLogo } from '@/components/pdk-logo';
 
 type Answers  = Record<string, boolean | null>;
 type Comments = Record<string, string>;
@@ -125,7 +126,7 @@ export function EvaluationForm({ conductorId, existingDraft }: EvaluationFormPro
     const printUrl = `/print/${submittedId}?organ=${encodeURIComponent(organName)}&conductor=${encodeURIComponent(conductorName)}&date=${encodeURIComponent(evalDate)}`;
     return (
       <div className="flex flex-col items-center justify-center gap-4 py-24 text-center">
-        <CheckCheck className="w-16 h-16 text-green-600" />
+        <PdkLogo className="w-16 h-16" />
         <h2 className="text-xl font-bold rtl-text">جەردەکە بەسەرکەوتووی پێشکەشکرا!</h2>
         <p className="text-muted-foreground rtl-text">سوپاس، جەردەکەت تۆمارکرا.</p>
         <Badge variant="success" className="text-base px-4 py-1">
@@ -201,7 +202,7 @@ export function EvaluationForm({ conductorId, existingDraft }: EvaluationFormPro
           <Card
             key={q.key}
             className={`transition-all border-2 ${
-              answer === true  ? 'border-green-200 bg-green-50/30' :
+              answer === true  ? 'border-[#f4c400]/50 bg-[#fffbea]' :
               answer === false ? 'border-red-200 bg-red-50/30' :
               'border-border'
             }`}

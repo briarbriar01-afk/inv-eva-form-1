@@ -17,8 +17,8 @@ export function KanbanCard({ evaluation, organName, conductorName, date }: Kanba
   const yesCount = EVALUATION_QUESTIONS.filter(({ key }) => evaluation[key] === true).length;
   const pct = Math.round((yesCount / EVALUATION_QUESTIONS.length) * 100);
 
-  const scoreColor = pct >= 85 ? '#16a34a' : pct >= 60 ? '#d97706' : '#dc2626';
-  const scoreBg   = pct >= 85 ? '#f0fdf4' : pct >= 60 ? '#fffbeb' : '#fef2f2';
+  const scoreColor = pct >= 85 ? '#173e88' : pct >= 60 ? '#b58b00' : '#dc2626';
+  const scoreBg   = pct >= 85 ? '#eef3ff' : pct >= 60 ? '#fffbea' : '#fef2f2';
 
   const printUrl = `/print/${evaluation.id}?organ=${encodeURIComponent(organName)}&conductor=${encodeURIComponent(conductorName)}&date=${encodeURIComponent(date)}`;
 
@@ -43,7 +43,7 @@ export function KanbanCard({ evaluation, organName, conductorName, date }: Kanba
                 key={key as string}
                 className="w-2 h-2 rounded-full"
                 style={{
-                  background: evaluation[key] === true ? '#16a34a' :
+                  background: evaluation[key] === true ? '#173e88' :
                               evaluation[key] === false ? '#ef4444' : '#e2e8f0',
                 }}
               />
@@ -100,7 +100,7 @@ export function KanbanCard({ evaluation, organName, conductorName, date }: Kanba
               <div key={key as string} className="space-y-0.5">
                 <div className="flex items-start gap-2">
                   <span className="flex-shrink-0 mt-0.5">
-                    {val === true  ? <CheckCircle2 className="w-3.5 h-3.5 text-green-600" /> :
+                    {val === true  ? <CheckCircle2 className="w-3.5 h-3.5 text-[#173e88]" /> :
                      val === false ? <XCircle      className="w-3.5 h-3.5 text-red-500"   /> :
                      <span className="w-3.5 h-3.5 block rounded-full border-2 border-slate-300 mt-0.5" />}
                   </span>

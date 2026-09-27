@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { EvaluationForm } from '@/components/evaluation-form';
 import { ClipboardList } from 'lucide-react';
 import { LogoutButton } from '@/components/logout-button';
+import { PdkLogo } from '@/components/pdk-logo';
 
 export const revalidate = 0;
 
@@ -34,7 +35,7 @@ export default async function ConductorPage() {
         <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center">
-              <ClipboardList className="w-5 h-5 text-white" />
+              <PdkLogo className="w-7 h-7" />
             </div>
             <div>
               <h1 className="text-base font-bold rtl-text">هەڵسەنگاندنی پرۆسەی جەرد</h1>
