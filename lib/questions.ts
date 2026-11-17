@@ -22,7 +22,7 @@ export const EVALUATION_QUESTIONS = [
   {
     key: 'q5' as const,
     commentKey: 'q5_comment' as const,
-    text: '٥. ئایا سەرجەم ژوور و کۆگاکانی ناو ئۆرگان سەیر کران لە لایەن کەسی ژمێیارەوە؟',
+    text: '٥. ئایا سەرجەم ژوور و کۆگاکانی ناو ئۆرگان سەیر کران لە لایەن کەسی ژمێریارەوە؟',
   },
   {
     key: 'q6' as const,
